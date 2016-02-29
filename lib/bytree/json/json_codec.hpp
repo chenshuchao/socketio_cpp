@@ -1,9 +1,9 @@
 #include <vector>
 
-#include "engineio/base/rapidjson/document.h"
-#include "engineio/base/rapidjson/prettywriter.h"
+#include "rapidjson/document.h"
+#include "rapidjson/prettywriter.h"
 
-namespace engineio {
+namespace bytree {
 
 class JsonCodec {
  public:

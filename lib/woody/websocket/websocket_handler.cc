@@ -96,7 +96,7 @@ void WebsocketHandler::SetCallback(const muduo::net::TcpConnectionPtr& conn) {
   conn_ = conn;
   conn_->setMessageCallback(
       boost::bind(&WebsocketHandler::OnData, this, _1, _2, _3));
-  conn_->setCloseCallbackWithoutThis(
+  conn_->setCloseCallback(
       boost::bind(&WebsocketHandler::OnClose, this));
 }
 

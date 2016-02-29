@@ -1,7 +1,6 @@
 #include "engineio/transports/websocket.h"
-
+#include <bytree/logging.hpp>
 #include <woody/base/string_util.h>
-#include <muduo/base/Logging.h>
 
 using namespace std;
 using namespace woody;
@@ -67,13 +66,13 @@ void WebsocketTransport::OnData(const string& data) {
 
 void WebsocketTransport::OnTextMessage(const WebsocketHandlerPtr& handler,
                                        const TextMessage& message) {
-  LOG_DEBUG << message.GetData();
+  LOG(DEBUG) << message.GetData();
   OnData(message.GetData());
 }
 
 void WebsocketTransport::OnBinaryMessage(const WebsocketHandlerPtr& handler,
                                        const BinaryMessage& message) {
-  LOG_DEBUG << message.GetData();
+  LOG(DEBUG) << message.GetData();
   OnData(message.GetData());
 }
 

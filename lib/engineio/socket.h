@@ -20,7 +20,6 @@ class Socket : public boost::enable_shared_from_this<Socket> {
   enum State {
     kStateOpening,
     kStateOpen,
-    kStateUpgrading,
     kStateClosing,
     kStateClose,
   };
@@ -78,6 +77,7 @@ class Socket : public boost::enable_shared_from_this<Socket> {
 
   void CreateAndSendPacket(int packet_type, const std::string& data);
 
+  // Handle upgrade request and wait for upgrade packet.
   bool MaybeUpgrade(const woody::HTTPHandlerPtr& handler,
                     const woody::HTTPRequest& req,
                     woody::HTTPResponse& resp);

@@ -1,18 +1,20 @@
 #include "socketio/socket.h"
 
-#include <muduo/base/Logging.h>
-#include "socketio/base/string_util.h"
+#include <bytree/logging.hpp>
+#include <bytree/string_util.hpp>
+
 #include "socketio/namespace.h"
 #include "socketio/callback.h"
 
 using namespace std;
+using namespace bytree;
 using namespace socketio;
 
 void DecodePacketBody(string& body, vector<string>& v) {
   Trim(body);
   LTrim(body, '[');
   RTrim(body, ']');
-  split(body, ",", v);
+  Split(body, ",", v);
   for (int i = 0, len = v.size(); i < len; i++) {
     Trim(v[i]);
     Trim(v[i], '\"');
@@ -55,7 +57,7 @@ void Socket::Emit(const string& event, const std::string& data) {
 }
 
 void Socket::OnConnect() {
-  LOG_DEBUG << "Socket::OnConnect.";
+  LOG(DEBUG) << "Socket::OnConnect.";
   Packet packet;
   packet.SetType(Packet::kTypeConnect);
   SendPacket(packet);
@@ -99,11 +101,11 @@ void Socket::OnEventPacket(const Packet& packet) {
   // TODO 
   if (v.size() < 2) return; 
   EventCallback cb = events_[v[0]];
-  LOG_DEBUG << "Socket::OnEventPacket - Event: " << v[0]
-            << "data: " << v[1];
+  LOG(DEBUG) << "Socket::OnEventPacket - Event: " << v[0]
+             << "data: " << v[1];
   if (!cb) {
-    LOG_DEBUG << "Socket::OnEventPacket - "
-              << "No event register, event name: " << v[0] << ".";
+    LOG(DEBUG) << "Socket::OnEventPacket - "
+               << "No event register, event name: " << v[0] << ".";
     return;
   }
   cb(shared_from_this(), v[1]);
@@ -131,7 +133,7 @@ void Socket::ForceClose() {
 }
 
 void Socket::OnError(const string& what) {
-  LOG_ERROR << "Socket::OnError - " << what;
+  LOG(ERROR) << "Socket::OnError - " << what;
   ForceClose();
 }
 

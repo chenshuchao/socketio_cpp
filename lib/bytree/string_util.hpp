@@ -1,31 +1,31 @@
-#ifndef STRING_UTIL_H
-#define STRING_UTIL_H
+#ifndef BYTREE_STRINGUTIL_H
+#define BYTREE_STRINGUTIL_H
 
 #include <string>
 #include <vector>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
-#include <muduo/base/StringPiece.h>
 
-namespace socketio {
-inline std::string convert_to_std(muduo::string s) {
-  return std::string(s.data(), s.size());
+namespace bytree {
+
+inline bool StartsWith(const std::string& s, const std::string& p) {
+  return 0 == s.find(p);
 }
 
-inline muduo::string convert_to_muduo(std::string s) {
-  return muduo::string(s.c_str(), s.size());
+inline bool EndsWith(const std::string& s, const std::string& p) {
+  return s.find(p) == (s.size() - p.size());
 }
 
-inline std::string int_to_string(int a) {
+inline std::string IntToString(int a) {
   return boost::lexical_cast<std::string>(a);
 }
 
-inline int string_to_int(std::string s) {
+inline int StringToInt(std::string s) {
   return boost::lexical_cast<int>(s);
 }
 
-inline void split(std::string s,
+inline void Split(std::string s,
                   std::string pattern,
                   std::vector<std::string>& res) {
   boost::algorithm::split(res, s, boost::algorithm::is_any_of(pattern));
@@ -58,6 +58,6 @@ inline std::string& RTrim(std::string & s, char x) {
 inline std::string& Trim(std::string &s, char x) {
   return LTrim(RTrim(s, x), x);
 }
-}
 
+}
 #endif

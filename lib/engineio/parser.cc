@@ -25,7 +25,13 @@ bool Parser::DecodePacket(const string& data, Packet& packet) {
   return true;
 }
 
+// TODO
+bool Parser::DecodeBase64Packet(const string& data, Packet& packet) {
+  return false;
+}
+
 bool Parser::DecodePayload(const string& data, vector<Packet>& packets) {
+  return false;
 }
 
 bool Parser::DecodePayloadAsBinary(const string& data, vector<Packet>& packets) {
@@ -71,7 +77,7 @@ void Parser::EncodePayloadAsBinary(vector<Packet>& packets, string& result) {
     int buf_size = encoding_len.size() + 2;
     string buf(buf_size, '0');
     buf[0] = 0;
-    for (int i = 0; i < encoding_len.size(); i ++) {
+    for (unsigned int i = 0; i < encoding_len.size(); i ++) {
       buf[i+1] = encoding_len[i] - '0';
     }
     buf[buf_size - 1] = 255;

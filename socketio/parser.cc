@@ -1,7 +1,9 @@
 #include "socketio/parser.h"
-#include "socketio/base/string_util.h"
+
+#include <bytree/string_util.hpp>
 
 using namespace std;
+using namespace bytree;
 using namespace socketio;
 
 bool Parser::Decode(const string& data, Packet& packet) {
@@ -48,7 +50,7 @@ bool Parser::DecodeString(const string& data, Packet& packet) {
     while(j < size && isdigit(data[j])) j++;
     string str_id(data, i, j-i);
     // TODO
-    int id = string_to_int(str_id);
+    int id = StringToInt(str_id);
     packet.SetID(id);
     i = j;
   }
@@ -74,7 +76,7 @@ bool Parser::Encode(const Packet& packet, string& data) {
 
 bool Parser::EncodeAsString(const Packet& packet, string& data) {
   int type = packet.GetType();
-  data.append(int_to_string(type));
+  data.append(IntToString(type));
 
   string nsp = packet.GetNamespace();
   bool has_nsp = false;
@@ -89,7 +91,7 @@ bool Parser::EncodeAsString(const Packet& packet, string& data) {
       data.append(",");
       has_nsp = false;
     }
-    data.append(int_to_string(id));
+    data.append(IntToString(id));
   }
 
   string body = packet.GetBody();

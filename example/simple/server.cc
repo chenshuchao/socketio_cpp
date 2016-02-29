@@ -1,7 +1,8 @@
+#define LOG_LEVEL DEBUG
 #include <fstream>
 #include <string>
 
-#include <muduo/base/Logging.h>
+#include <bytree/logging.hpp>
 #include <socketio/server.h>
 #include <woody/http/http_server.h>
 #include <woody/http/http_application.h>
@@ -16,7 +17,7 @@ bool IsStringEndWith(string s, string p) {
 
 class FileApp : public HTTPApplication {
  public:
-  FileApp() : root_("/home/shuchao/Documents/github/socketio_cpp/example/simple") {
+  FileApp(const string& root) : root_(root) {
   }
   virtual ~FileApp() { }
 
@@ -60,20 +61,22 @@ class SimpleChat {
   }
  private:
   void OnChatMessage(const SocketPtr& socket, const string& data) {
-    LOG_DEBUG << "SimpleServer OnChatMessage - " << ", data: " << data;
-    socket->Emit("chat message", data + "from server");
+    socket->Emit("chat message", "From server: " + data);
   }
 };
 
-int main() {
-  muduo::Logger::setLogLevel(muduo::Logger::DEBUG);
+int main(int argc, char** argv) {
+  if (argc < 2) {
+    LOG(ERROR) << "Program needs more params.";
+    return 1;
+  }
+  string root_path(argv[1]);
+  FileApp file_app(root_path);
 
   SimpleChat simple_chat;
   Server sio_server("SocketIOServer");
   sio_server.SetSocketConnectCallback(
     boost::bind(&SimpleChat::OnConnection, &simple_chat, _1));
-
-  FileApp file_app;
 
   HTTPServer http_server(5011, "HTTPServer");
   http_server.Handle("/socket.io", &sio_server);

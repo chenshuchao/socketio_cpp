@@ -1,6 +1,6 @@
 #include "socketio/client.h"
 
-#include <muduo/base/Logging.h>
+#include <bytree/logging.hpp>
 #include "socketio/server.h"
 #include "socketio/namespace.h"
 
@@ -17,11 +17,10 @@ Client::Client(Server* server, const engineio::SocketPtr& socket)
 }
 
 bool Client::Connect(const string& nsp_name) {
-  LOG_DEBUG << "Client::Connect - nsp: " << nsp_name;
+  LOG(DEBUG) << "Client::Connect - nsp: " << nsp_name;
  
   NamespacePtr nsp = server_->GetNamespace(nsp_name);
   if (!nsp) {
-    // error
     Packet packet;
     packet.SetType(Packet::kTypeError)
           .SetNamespace(nsp_name)
@@ -40,8 +39,8 @@ bool Client::Connect(const string& nsp_name) {
 void Client::SendPacket(const Packet& packet) {
   string data;
   Parser::Encode(packet, data);
-  LOG_DEBUG << "Client::SendPacket - type: " << packet.GetType()
-            << ", data: " << packet.GetBody();
+  LOG(DEBUG) << "Client::SendPacket - type: " << packet.GetType()
+             << ", data: " << packet.GetBody();
   Send(data);
 }
 
@@ -50,7 +49,7 @@ void Client::ForceClose() {
 }
 
 void Client::OnData(const string& data) {
-  LOG_DEBUG << "Client::OnData.";
+  LOG(DEBUG) << "Client::OnData.";
   Packet packet;
   Parser::Decode(data, packet);
   if (packet.GetType() == Packet::kTypeConnect) {

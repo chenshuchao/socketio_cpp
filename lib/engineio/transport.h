@@ -7,6 +7,7 @@
 #include <boost/function.hpp>
 #include <woody/http/http_request.h>
 #include <woody/http/http_response.h>
+
 #include "engineio/parser.h"
 
 namespace engineio {
@@ -65,7 +66,7 @@ class BaseTransport {
   }
 
  private:
-  // Handle data.
+  // 
   virtual void OnData(const std::string& data) = 0;
 
   std::string name_;
