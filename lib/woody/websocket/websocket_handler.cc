@@ -1,10 +1,13 @@
 #include "woody/websocket/websocket_handler.h"
 
-#include <muduo/base/Logging.h>
-#include "woody/base/string_util.h"
-#include "woody/base/ssl_util.h"
+#include <bytree/logging.hpp>
+#include <bytree/string_util.hpp>
+#include <bytree/ssl_util.hpp>
+
+#include "woody/base/base_util.h"
 
 using namespace std;
+using namespace bytree;
 using namespace woody;
 
 WebsocketHandler::WebsocketHandler(const std::string& name)
@@ -30,7 +33,7 @@ bool WebsocketHandler::HandleUpgrade(const HTTPHandlerPtr& handler,
 
   string key;
   if (req.GetHeader("Sec-WebSocket-Key", key)) {
-    string ws_key = base64_decode(key);
+    string ws_key = Base64Decode(key);
     if (ws_key.size() != 16) {
       //error
       return false;
@@ -39,7 +42,7 @@ bool WebsocketHandler::HandleUpgrade(const HTTPHandlerPtr& handler,
 
   string version;
   if(req.GetHeader("Sec-WebSocket-Version", version)) {
-    if(string_to_int(version) != kVersion) {
+    if(StringToInt(version) != kVersion) {
       //error
       return false;
     }
@@ -49,9 +52,9 @@ bool WebsocketHandler::HandleUpgrade(const HTTPHandlerPtr& handler,
   if (req.GetHeader("Sec-WebSocket-Protocol", protocols)) {
     vector<string> protocol_vec;
     if (!protocols.empty()) {
-      split(protocols, ",", protocol_vec);
+      Split(protocols, ",", protocol_vec);
       for(int i = 0, len = protocol_vec.size(); i < len; i ++) {
-        trim(protocol_vec[i]);
+        Trim(protocol_vec[i]);
         AddSubProtocol(protocol_vec[i]);
       }
     }
@@ -59,7 +62,7 @@ bool WebsocketHandler::HandleUpgrade(const HTTPHandlerPtr& handler,
   // TODO extension
 
   string temp = key + kWebsocketGUID;
-  string accept_key = base64_encode(sha1(temp));
+  string accept_key = Base64Encode(Sha1(temp));
 
   resp.AddHeader("Upgrade", "websocket")
       .AddHeader("Connection", "Upgrade")
@@ -96,17 +99,17 @@ void WebsocketHandler::SetCallback(const muduo::net::TcpConnectionPtr& conn) {
   conn_ = conn;
   conn_->setMessageCallback(
       boost::bind(&WebsocketHandler::OnData, this, _1, _2, _3));
-  conn_->setCloseCallback(
+  conn_->setCloseCallbackWithoutThis(
       boost::bind(&WebsocketHandler::OnClose, this));
 }
 
 void WebsocketHandler::OnData(const muduo::net::TcpConnectionPtr& conn,
                               muduo::net::Buffer* buf,
                               muduo::Timestamp) {
-  LOG_INFO << "WebsocketHandler::OnData [" << GetName()
-           << "] - protocol: Websocket.";
+  LOG(INFO) << "WebsocketHandler::OnData [" << GetName()
+            << "] - protocol: Websocket.";
   while (buf->readableBytes() > 0) {
-    string data = convert_to_std(buf->retrieveAllAsString());
+    string data = ConvertToStd(buf->retrieveAllAsString());
     size_t parsed_bytes = 0;
     // It means codec error or we need to wait for more data.
     if (!ws_codec_.OnData(data, parsed_bytes) ||
@@ -114,10 +117,10 @@ void WebsocketHandler::OnData(const muduo::net::TcpConnectionPtr& conn,
       break; 
     }
     string unparsed_str(data, parsed_bytes);
-    LOG_DEBUG << "unparsed bytes" << unparsed_str.size()
-              << "unparsed_str : " << unparsed_str;
+    LOG(DEBUG) << "unparsed bytes" << unparsed_str.size()
+               << "unparsed_str : " << unparsed_str;
     buf->prepend(unparsed_str.c_str(), unparsed_str.size());
-    LOG_DEBUG << "readable bytes: " << buf->readableBytes();
+    LOG(DEBUG) << "readable bytes: " << buf->readableBytes();
   }
 }
 
@@ -165,12 +168,12 @@ bool WebsocketHandler::SendWebsocketMessage(
     const string& data) {
   WebsocketFrame frame;
   if (!ws_codec_.ConvertMessageToFrame(type, data, frame)) {
-    LOG_ERROR << "message.SingleFrame error";
+    LOG(ERROR) << "message.SingleFrame error";
     return false;
   }
   string frame_string;
   if(!ws_codec_.ConvertFrameToString(frame, frame_string)) {
-    LOG_ERROR << "message.SingleFrame error";
+    LOG(ERROR) << "message.SingleFrame error";
     return false;
   }
   conn_->send(frame_string);

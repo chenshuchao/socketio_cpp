@@ -1,9 +1,12 @@
 #include "woody/http/http_handler.h"
 
-#include <muduo/base/Logging.h>
-#include "woody/base/string_util.h"
+#include <bytree/logging.hpp>
+#include <bytree/string_util.hpp>
+
+#include "woody/base/base_util.h"
 
 using namespace std;
+using namespace bytree;
 using namespace woody;
 
 HTTPHandler::HTTPHandler(const string& name,
@@ -26,33 +29,33 @@ void HTTPHandler::ForceClose() {
 }
 
 void HTTPHandler::Send(const string& data) {
-  LOG_INFO << "HTTPHandler::Send [" << GetName()
-           << "] - response:\n" << data;
+  LOG(DEBUG) << "HTTPHandler::Send [" << GetName()
+            << "] - response:\n" << data;
   conn_->send(data);
 }
 
 void HTTPHandler::OnData(const muduo::net::TcpConnectionPtr& conn,
                          muduo::net::Buffer* buf,
                          muduo::Timestamp) {
-  LOG_DEBUG << "HTTPHandler::OnData [" << GetName()
+  LOG(DEBUG) << "HTTPHandler::OnData [" << GetName()
            << "] - protocol: HTTP.";
   while (buf->readableBytes() > 0) {
-    string data = convert_to_std(buf->retrieveAllAsString());
+    string data = ConvertToStd(buf->retrieveAllAsString());
     size_t bytes_parsed = codec_.OnData(data);
     if (!bytes_parsed) {
       // It means we need to wait for more data.
       break; 
     }
     string unparsed_str(data, bytes_parsed);
-    LOG_DEBUG << "unparsed bytes" << unparsed_str.size()
-              << "unparsed_str : " << unparsed_str;
+    LOG(DEBUG) << "unparsed bytes" << unparsed_str.size()
+               << "unparsed_str : " << unparsed_str;
     buf->prepend(unparsed_str.c_str(), unparsed_str.size());
-    LOG_DEBUG << "readable bytes: " << buf->readableBytes();
+    LOG(DEBUG) << "readable bytes: " << buf->readableBytes();
   }
 }
 
 void HTTPHandler::OnMessageComplete(HTTPCodec::StreamID id, HTTPRequest& req) {
-  LOG_DEBUG << "HTTPHandler::OnMessageComplete []";
+  LOG(DEBUG) << "HTTPHandler::OnMessageComplete []";
   HTTPResponse resp(shared_from_this());
   request_complete_callback_(shared_from_this(), req, resp);
 }

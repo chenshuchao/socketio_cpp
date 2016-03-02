@@ -2,41 +2,17 @@
 
 #include <boost/bind.hpp>
 #include <boost/bind/placeholders.hpp>
-#include <muduo/base/Logging.h>
-
-#include "woody/base/string_util.h"
+#include <bytree/logging.hpp>
+#include <bytree/string_util.hpp>
 
 using namespace std;
+using namespace bytree;
 using namespace woody;
 
-WebsocketServer::WebsocketServer(int port, const string& name)
-    : loop_(),
-      tcp_server_(&loop_,
-                  muduo::net::InetAddress(port),
-                  convert_to_muduo(name),
-                  muduo::net::TcpServer::kNoReusePort) {
-  tcp_server_.setConnectionCallback(
-      boost::bind(&WebsocketServer::OnCreateOrDestroyConnection, this, _1));
-  tcp_server_.setMessageCallback(
-      boost::bind(&WebsocketServer::OnData, this, _1, _2, _3));
-}
-
-void WebsocketServer::Start() {
-  LOG_INFO << "WebsocketServer::Start [" << name_ << "].";
-  tcp_server_.start();
-  loop_.loop();
-}
-
-// TODO
-void WebsocketServer::Stop() { }
-
-void WebsocketServer::OnCreateOrDestroyConnection(
-         const muduo::net::TcpConnectionPtr& conn) {
-  if (conn->connected()) {
-    OnConnection(conn);
-  }
-  else {
-    OnDisconnection(conn);
+void WebsocketServer::HandleRequest(const HTTPHandlerPtr& handler,
+                                    const HTTPRequest& req,
+                                    HTTPResponse& resp) {
+  if (req.IsUpgrade()) {
   }
 }
 
@@ -73,19 +49,6 @@ void WebsocketServer::OnDisconnection(const muduo::net::TcpConnectionPtr& conn) 
   handler->OnClose();
 }
 
-void WebsocketServer::OnData(const muduo::net::TcpConnectionPtr& conn,
-                        muduo::net::Buffer* buf,
-                        muduo::Timestamp) {
-  WebsocketHandlerPtr handler = handler_map_[convert_to_std(conn->name())];
-  if (!handler) {
-    LOG_ERROR << "WebsocketServer::OnData [" << name_
-              << "] connecton [" << conn->name()
-              << " handler not found.";
-    return;
-  }
-  handler->OnData(buf);
-}
-
 void WebsocketServer::OnHandlerClose(const WebsocketHandlerPtr& handler) {
   LOG_DEBUG << "WebsocketServer::OnHandlerClose - "
             << handler->GetName();
@@ -93,9 +56,5 @@ void WebsocketServer::OnHandlerClose(const WebsocketHandlerPtr& handler) {
   if (handler_close_callback_) {
     handler_close_callback_(handler);
   }
-}
-
-void WebsocketServer::OnHandlerForceClose(const WebsocketHandlerPtr& handler) {
-  tcp_server_.removeAndDestroyConnection(handler->GetConn());
 }
 

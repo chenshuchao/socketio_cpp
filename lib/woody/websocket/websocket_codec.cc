@@ -1,13 +1,14 @@
 #include "woody/websocket/websocket_codec.h"
 
 #include <boost/bind.hpp>
-#include <muduo/base/Logging.h>
+#include <bytree/logging.hpp>
 
 #include "woody/base/base_util.h"
 #include "woody/base/endian_util.h"
 #include "woody/websocket/websocket_frame.h"
 
 using namespace std;
+using namespace bytree;
 using namespace woody;
 
 WebsocketCodec::WebsocketCodec()
@@ -18,8 +19,7 @@ WebsocketCodec::WebsocketCodec()
 };
 
 bool WebsocketCodec::OnData(const string& data, size_t& parsed_bytes) {
-  LOG_DEBUG << "WebsocketCodec::OnData - "
-            << "data :\n" << data;
+  LOG(DEBUG) << "WebsocketCodec::OnData - " << "data :\n" << data;
   if (!parser_.Parse(data, parsed_bytes)) {
     OnCodecError("Parser error");
     return false;
@@ -153,7 +153,7 @@ void WebsocketCodec::OnParsedFrame(const WebsocketFrame& frame) {
 }
 
 bool WebsocketCodec::OnContinuationFrame(const WebsocketFrame& frame) {
-  LOG_INFO << "WebsocketCodec::OnContinuationFrame";
+  LOG(INFO) << "WebsocketCodec::OnContinuationFrame";
   string frame_body;
   if (!HandleFrameBody(frame, frame_body)) {
     return false;
@@ -182,12 +182,12 @@ bool WebsocketCodec::OnContinuationFrame(const WebsocketFrame& frame) {
 }
 
 bool WebsocketCodec::OnTextFrame(const WebsocketFrame& frame) {
-  LOG_INFO << "WebsocketCodec::OnTextFrame";
+  LOG(INFO) << "WebsocketCodec::OnTextFrame";
   string frame_body;
   if (!HandleFrameBody(frame, frame_body)) {
     return false;
   }
-  LOG_DEBUG << "WebsocketCodec::OnTextFrame - data: " << frame_body;
+  LOG(DEBUG) << "WebsocketCodec::OnTextFrame - data: " << frame_body;
   if (cur_message_type_ != WebsocketMessage::kNoneMessage) {
     OnCodecError("Received a new message before completing previous");
     return false;
@@ -203,12 +203,12 @@ bool WebsocketCodec::OnTextFrame(const WebsocketFrame& frame) {
 }
 
 bool WebsocketCodec::OnBinaryFrame(const WebsocketFrame& frame) {
-  LOG_INFO << "WebsocketCodec::OnBinaryFrame";
+  LOG(INFO) << "WebsocketCodec::OnBinaryFrame";
   string frame_body;
   if (!HandleFrameBody(frame, frame_body)) {
     return false;
   }
-  LOG_DEBUG << "WebsocketCodec::OnBinaryFrame - data: " << frame_body;
+  LOG(DEBUG) << "WebsocketCodec::OnBinaryFrame - data: " << frame_body;
   if (cur_message_type_ != WebsocketMessage::kNoneMessage) {
     OnCodecError("Received a new message before completing previous");
     return false;
@@ -224,12 +224,12 @@ bool WebsocketCodec::OnBinaryFrame(const WebsocketFrame& frame) {
 }
 
 bool WebsocketCodec::OnCloseFrame(const WebsocketFrame& frame) {
-  LOG_INFO << "WebsocketCodec::OnCloseFrame";
+  LOG(INFO) << "WebsocketCodec::OnCloseFrame";
   string frame_body;
   if (!HandleFrameBody(frame, frame_body)) {
     return false;
   }
-  LOG_DEBUG << "WebsocketCodec::OnCloseFrame - data: " << frame_body;
+  LOG(DEBUG) << "WebsocketCodec::OnCloseFrame - data: " << frame_body;
   CloseMessage m;
   m.Append(frame_body);
   close_message_callback_(m);
@@ -237,24 +237,24 @@ bool WebsocketCodec::OnCloseFrame(const WebsocketFrame& frame) {
 }
 
 bool WebsocketCodec::OnPingFrame(const WebsocketFrame& frame) {
-  LOG_INFO << " WebsocketCodec::OnPingFrame";
+  LOG(INFO) << " WebsocketCodec::OnPingFrame";
   string frame_body;
   if (!HandleFrameBody(frame, frame_body)) {
     return false;
   }
-  LOG_DEBUG << "WebsocketCodec::OnPingFrame - data: " << frame_body;
+  LOG(DEBUG) << "WebsocketCodec::OnPingFrame - data: " << frame_body;
   PingMessage m;
   ping_message_callback_(m);
   return true;
 }
 
 bool WebsocketCodec::OnPongFrame(const WebsocketFrame& frame) {
-  LOG_INFO << "WebsocketCodec::OnPongFrame";
+  LOG(INFO) << "WebsocketCodec::OnPongFrame";
   string frame_body;
   if (!HandleFrameBody(frame, frame_body)) {
     return false;
   }
-  LOG_DEBUG << "WebsocketCodec::OnPongFrame - data: " << frame_body;
+  LOG(DEBUG) << "WebsocketCodec::OnPongFrame - data: " << frame_body;
   PongMessage message;
   pong_message_callback_(message);
   return true;
@@ -282,7 +282,7 @@ bool WebsocketCodec::HandleFrameBody(const WebsocketFrame& frame, string& handle
 }
 
 void WebsocketCodec::OnCodecError(string reason) {
-  LOG_ERROR << "WebsocketCodec::OnCodecError "
+  LOG(ERROR) << "WebsocketCodec::OnCodecError "
             << "error : " << reason;
   error_callback_();
 }

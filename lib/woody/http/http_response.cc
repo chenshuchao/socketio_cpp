@@ -1,9 +1,12 @@
 #include "woody/http/http_response.h"
-#include "woody/base/string_util.h"
+
+#include <bytree/string_util.hpp>
+
 #include "woody/http/http_handler.h"
 
-using namespace woody;
 using namespace std;
+using namespace bytree;
+using namespace woody;
 
 HTTPResponse& HTTPResponse::SetStatus(int code, const string& message) {
   status_code_ = code;
@@ -42,7 +45,7 @@ void HTTPResponse::GetAllHeaders(vector<string>& name, vector<string>& value) co
 
 std::string HTTPResponse::ToString() const {
   string first_line = "";
-  first_line = "HTTP/1.1 " + int_to_string(status_code_) + " " + status_message_;
+  first_line = "HTTP/1.1 " + IntToString(status_code_) + " " + status_message_;
   
   string headers = "";
   for (map<string, string>::const_iterator it = headers_map_.begin();
@@ -70,6 +73,6 @@ void HTTPResponse::CleanUp() {
 }
 
 void HTTPResponse::Format() {
-  AddHeader("Content-Length", int_to_string(body_.size()));
+  AddHeader("Content-Length", IntToString(body_.size()));
 }
 

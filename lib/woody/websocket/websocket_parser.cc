@@ -1,11 +1,12 @@
 #include "woody/websocket/websocket_parser.h"
 
-#include <muduo/base/Logging.h>
+#include <bytree/logging.hpp>
 
 #include "woody/base/endian_util.h"
 #include "woody/websocket/websocket_frame.h"
 
 using namespace std;
+using namespace bytree;
 using namespace woody;
 
 WebsocketParser::WebsocketParser()
@@ -79,8 +80,6 @@ bool WebsocketParser::Parse(const char* data, size_t len, size_t& parsed_bytes) 
     state_ = kParsingBodyBegin;
   }
 
-
-  LOG_INFO << "WebsocketParser::Parse - Parsing frame body";
   size_t body_need_bytes = payload_length_ - body_.size();
   if (body_need_bytes <= len - parsed_bytes) {
     body_.append(data+parsed_bytes, body_need_bytes);
@@ -106,8 +105,8 @@ void WebsocketParser::OnParsingComplete() {
 }
 
 void WebsocketParser::OnParsingError(string reason) {
-  LOG_ERROR << "WebsocketParser::OnParsingError -"
-            << "error: " << reason;
+  LOG(ERROR) << "WebsocketParser::OnParsingError -"
+             << "error: " << reason;
   //error_callback_();
 }
 

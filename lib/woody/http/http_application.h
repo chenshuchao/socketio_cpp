@@ -8,6 +8,8 @@ class HTTPHandler;
 typedef boost::shared_ptr<HTTPHandler> HTTPHandlerPtr;
 class HTTPRequest;
 class HTTPResponse;
+
+// Interface for app which handles the http request.
 class HTTPApplication {
  public:
   virtual void HandleRequest(const HTTPHandlerPtr& handler,

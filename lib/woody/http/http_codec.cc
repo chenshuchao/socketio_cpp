@@ -1,11 +1,13 @@
 #include "woody/http/http_codec.h"
 
 #include <string>
-#include <muduo/base/Logging.h>
+
+#include <bytree/string_util.hpp>
+#include <bytree/logging.hpp>
 #include <muduo/net/Buffer.h>
-#include "woody/base/string_util.h"
 
 using namespace std;
+using namespace bytree;
 using namespace woody;
 
 http_parser_settings HTTPCodec::kParserSettings;
@@ -34,14 +36,14 @@ void HTTPCodec::InitParserSettings() {
 }
 
 size_t HTTPCodec::OnData(const string& data) {
-  LOG_DEBUG << "HTTPCodec::OnData [" << name_
-            << "], data:\n" << data;
+  LOG(DEBUG) << "HTTPCodec::OnData [" << name_
+             << "], data:\n" << data;
   size_t bytes_parsed = http_parser_execute(&parser_,
                                             &kParserSettings,
                                             data.c_str(),
                                             data.size());
-  LOG_DEBUG << "HTTPCodec::OnData [" << name_
-            << "], parse " << bytes_parsed << " bytes.";
+  LOG(DEBUG) << "HTTPCodec::OnData [" << name_
+             << "], parse " << bytes_parsed << " bytes.";
 
   if ((HTTP_PARSER_ERRNO(&parser_) != HPE_OK) &&
       (HTTP_PARSER_ERRNO(&parser_) != HPE_PAUSED)) {
@@ -191,8 +193,8 @@ int HTTPCodec::OnMessageCompleteCallback(http_parser *parser) {
 }
 
 void HTTPCodec::OnParseError(string what) {
-  LOG_ERROR << "HTTPCodec::OnParseError - "
-            << "error: " << what;
+  LOG(ERROR) << "HTTPCodec::OnParseError - "
+             << "error: " << what;
   error_callback_();
 }
 

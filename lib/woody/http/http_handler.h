@@ -5,7 +5,7 @@
 #include <boost/bind.hpp>
 #include <muduo/net/TcpConnection.h>
 
-#include "woody/base_handler.h"
+#include "woody/base/base_handler.h"
 #include "woody/http/http_codec.h"
 
 namespace woody {

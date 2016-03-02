@@ -1,6 +1,10 @@
+#ifndef WOODY_BASE_ENDIAN_H
+#define WOODY_BASE_ENDIAN_H
+
 #include "stdint.h"
 #include "endian.h"
 
+namespace woody {
 inline uint64_t HostToNetwork64(uint64_t host64)
 {
   return htobe64(host64);
@@ -48,3 +52,6 @@ inline uint16_t NetworkToHostInt16(const unsigned char* bytes)
   uint16_t net16 = *(uint16_t*)bytes;
   return be16toh(net16);
 }
+}
+
+#endif

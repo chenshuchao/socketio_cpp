@@ -6,55 +6,52 @@
 
 #include "woody/tcp_server.h"
 #include "woody/http/http_handler.h"
+#include "woody/http/http_application.h"
 #include "woody/websocket/websocket_handler.h"
 
 namespace woody {
 
-class WebsocketServer {
+class WebsocketServer : public HTTPApplication {
  public:
   typedef boost::function<void (const WebsocketHandlerPtr&)>
       HandlerCloseCallback;
-  WebsocketServer(int port, const std::string& name);
-  virtual ~WebsocketServer() {}
 
-  void Start();
-  void Stop();
-  void Bind();
+  WebsocketServer(const std::string& name) { }
+
+  ~WebsocketServer() { }
 
   void SetHandlerCloseCallback(const HandlerCloseCallback& cb) {
     handler_close_callback_ = cb;
   }
 
-  virtual void OnRequest(const WebsocketHandlerPtr& handler,
-                         const HTTPRequest& req,
-                         HTTPResponse& resp) = 0;
-  virtual void OnWebsocketTextMessage(const WebsocketHandlerPtr& handler,
-                                      const TextMessage&) = 0;
-  virtual void OnBinaryMessage(const WebsocketHandlerPtr& handler,
-                               const BinaryMessage&) {}
-  virtual void OnCloseMessage(const WebsocketHandlerPtr& handler,
-                              const CloseMessage&) {}
-  virtual void OnPingMessage(const WebsocketHandlerPtr& handler,
-                             const PingMessage&) {}
-  virtual void OnPongMessage(const WebsocketHandlerPtr& handler,
-                             const PongMessage&) {}
+  virtual void HandleRequest(const HTTPHandlerPtr& handler,
+                             const HTTPRequest& req,
+                             HTTPResponse& resp);
+
+  void OnTextMessage(const WebsocketHandlerPtr& handler,
+                     const TextMessage&);
+
+  void OnBinaryMessage(const WebsocketHandlerPtr& handler,
+                       const BinaryMessage&);
+
+  void OnCloseMessage(const WebsocketHandlerPtr& handler,
+                      const CloseMessage&);
+
+  void OnPingMessage(const WebsocketHandlerPtr& handler,
+                     const PingMessage&);
+
+  void OnPongMessage(const WebsocketHandlerPtr& handler,
+                     const PongMessage&);
 
  private:
   //
-  void OnCreateOrDestroyConnection(const muduo::net::TcpConnectionPtr& conn);
-  void OnConnection(const muduo::net::TcpConnectionPtr& conn);
-  void OnDisconnection(const muduo::net::TcpConnectionPtr& conn);
-  void OnData(const muduo::net::TcpConnectionPtr& conn, muduo::net::Buffer* buf, muduo::Timestamp);
-
   void OnHandlerClose(const WebsocketHandlerPtr& handler);
-  void OnHandlerForceClose(const WebsocketHandlerPtr& handler);
 
   std::string name_;
-  muduo::net::EventLoop loop_;
-  muduo::net::TcpServer tcp_server_;
-  std::map<std::string, WebsocketHandlerPtr> handler_map_;
-  HandlerCloseCallback handler_close_callback_;
 
+  std::map<std::string, WebsocketHandlerPtr> handler_map_;
+
+  HandlerCloseCallback handler_close_callback_;
 };
 }
 
