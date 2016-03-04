@@ -16,6 +16,7 @@ typedef boost::shared_ptr<NamespaceManager> NamespaceManagerPtr;
 
 class Client : public boost::enable_shared_from_this<Client> {
  public:
+  typedef std::map<std::string, SocketPtr> String2SocketPtr;
   typedef boost::function<void (ClientPtr)> CloseCallback;
   Client(Server* server, const engineio::SocketPtr& socket);
 
@@ -23,7 +24,7 @@ class Client : public boost::enable_shared_from_this<Client> {
     return eio_socket_->GetName();
   }
 
-  int GetID() const { return id_; }
+  std::string GetSid() const { return id_; }
 
   bool Connect(const std::string& nsp_name);
 
@@ -40,6 +41,8 @@ class Client : public boost::enable_shared_from_this<Client> {
 
   void ForceClose();
 
+  void Remove(const SocketPtr& socket);
+
  private:
   void OnData(const std::string& data);
 
@@ -55,9 +58,9 @@ class Client : public boost::enable_shared_from_this<Client> {
 
   Server* server_;
   engineio::SocketPtr eio_socket_;
-  int id_;
+  std::string id_;
   // { namespace_name, Socket}
-  std::map<std::string, SocketPtr> sockets_;
+  String2SocketPtr sockets_;
   SocketConnectCallback socket_connect_callback_;
   CloseCallback close_callback_;
 };

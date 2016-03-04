@@ -24,12 +24,13 @@ class Packet {
     return true;
   }
 
-  std::string GetData() const { return data_; }
-  void SetData(const std::string& data) { data_ = data; }
+  std::string GetBody() const { return body_; }
+
+  void SetBody(const std::string& body) { body_ = body; }
 
  private:
   int type_;
-  std::string data_;
+  std::string body_;
 };
 
 }

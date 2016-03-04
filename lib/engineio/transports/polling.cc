@@ -29,7 +29,9 @@ void PollingTransport::HandleRequest(const HTTPHandlerPtr& handler,
 void PollingTransport::OnData(const std::string& data) {
   vector<Packet> packets;
   Parser::DecodePayload(data, packets);
-  // ...
+  for (unsigned int i = 0; i < packets.size(); i ++) {
+    OnPacket(packets[i]);
+  }
 }
 
 void PollingTransport::HandlePollRequest(const HTTPRequest& req,

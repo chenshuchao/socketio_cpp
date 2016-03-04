@@ -30,7 +30,8 @@ void Server::Of(string nsp_name) {
   if (nsp_name[0] != '/') nsp_name = "/" + nsp_name;
   if (GetNamespace(nsp_name) == NULL) {
     LOG(DEBUG) << "Server::Of - Initializing namespace: " << nsp_name;
-    NamespacePtr nsp(new Namespace(nsp_name));
+    NamespacePtr nsp(new Namespace(nsp_name,
+                     adapter_factory_.Create()));
     nsps_[nsp_name] = nsp;
   }
 }
@@ -44,24 +45,25 @@ NamespacePtr Server::GetNamespace(const string& nsp_name) {
 }
 
 void Server::OnConnection(const engineio::SocketPtr& socket) {
-  string name = socket->GetName();
-  LOG(DEBUG) << "Server::OnConnection - " << "name: " << name;
-
+  string sid = socket->GetSid();
+  LOG(DEBUG) << "Server::OnConnection - " << "Client sid: " << sid;
+           
   ClientPtr client(new Client(this, socket));
   client->SetCloseCallback(
      boost::bind(&Server::OnClientClose, this, _1));
   client->SetSocketConnectCallback(socket_connect_callback_);
-  clients_[name] = client;
+  String2ClientPtr::iterator it = clients_.find(sid);
+  // TODO assert or just log error
+  assert(it == clients_.end());
+  clients_[sid] = client;
   client->Connect("/");
 }
 
 void Server::OnClientClose(const ClientPtr& client) {
-  string socket_name = client->GetEngineIOSocketName();
-  map<string, ClientPtr>::iterator it =
-       clients_.find(socket_name);
-  if (it == clients_.end()) {
-    // error
-  }
+  string sid = client->GetSid();
+  String2ClientPtr::iterator it = clients_.find(sid);
+  // TODO assert or just log error
+  assert (it != clients_.end());
   clients_.erase(it);
 }
 

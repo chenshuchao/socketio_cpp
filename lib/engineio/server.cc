@@ -59,8 +59,12 @@ void Server::Handshake(const HTTPHandlerPtr& handler,
                        const HTTPRequest& req,
                        HTTPResponse& resp,
                        const string& transport_name) {
-  // TODO
-  string sid =  GenerateBase64ID();
+  // TODO find whether repeat?
+  string sid;
+  while(true) {
+    sid = GenerateBase64ID();
+    if(sockets_.find(sid) == sockets_.end()) break;
+  }
   LOG(DEBUG) << "Server::Handshake - " << "sid : " << sid;
 
   resp.AddHeader("Set-Cookie", cookie_prefix_ + "=" + sid);

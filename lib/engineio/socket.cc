@@ -53,10 +53,10 @@ void Socket::OnPacket(const Packet& packet) {
 
 void Socket::OnPacketWhenUpgrading(const Packet& packet) {
   if (Packet::kPacketPing == packet.GetType() &&
-      "probe" == packet.GetData()) {
+      "probe" == packet.GetBody()) {
     Packet packet;
     packet.SetType(Packet::kPacketPong);
-    packet.SetData("probe");
+    packet.SetBody("probe");
     vector<Packet> packets;
     packets.push_back(packet);
     upgrading_transport_->SendPackets(packets);
@@ -102,28 +102,29 @@ void Socket::ForceClose() {
 }
 
 void Socket::OnClose() {
-  if (close_callback_with_this_) {
-    close_callback_with_this_(shared_from_this());
-  }
+  LOG(DEBUG) << "Socket::OnClose.";
   if (close_callback_) {
     close_callback_();
+  }
+  if (close_callback_with_this_) {
+    close_callback_with_this_(shared_from_this());
   }
 }
 
 void Socket::OnPingPacket(const Packet& packet) {
   CreateAndSendPacket(Packet::kPacketPong, "");
-  ping_callback_(shared_from_this(), packet.GetData());
+  ping_callback_(shared_from_this(), packet.GetBody());
 }
 
 void Socket::OnMessagePacket(const Packet& packet) {
-  message_callback_(shared_from_this(), packet.GetData());
+  message_callback_(shared_from_this(), packet.GetBody());
 }
 
 void Socket::OnUpgradePacket(const Packet& packet) {
 }
 
 void Socket::CreateAndSendPacket(int packet_type, const string& data) {
-  LOG(DEBUG) << "Socket::SendPacket, packet_type: " << packet_type;
+  LOG(DEBUG) << "Socket::CreateAndSendPacket, packet_type: " << packet_type;
   Packet packet;
   // TODO unnecessary ?
   if (!packet.SetType(packet_type)) {
@@ -131,7 +132,7 @@ void Socket::CreateAndSendPacket(int packet_type, const string& data) {
               << " Unknown packet type : " << packet_type;
     return;
   }
-  packet.SetData(data);
+  packet.SetBody(data);
   // LOCK
   write_buffer_.push_back(packet);
   // unlock

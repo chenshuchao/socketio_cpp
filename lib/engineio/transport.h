@@ -33,7 +33,9 @@ class BaseTransport {
   virtual void SendPackets(std::vector<Packet>& packets) = 0;
 
   virtual void OnClose() {
-    close_callback_();
+    if (close_callback_) {
+      close_callback_();
+    }
   }
 
   virtual void ForceClose() = 0;

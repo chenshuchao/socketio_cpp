@@ -1,8 +1,10 @@
 #include "engineio/transports/websocket.h"
 #include <bytree/logging.hpp>
-#include <woody/base/string_util.h>
+#include <bytree/string_util.hpp>
+#include <woody/base/base_util.h>
 
 using namespace std;
+using namespace bytree;
 using namespace woody;
 using namespace engineio;
 
@@ -10,7 +12,7 @@ WebsocketTransport::WebsocketTransport(const HTTPHandlerPtr& handler,
                                        const HTTPRequest& req,
                                        HTTPResponse& resp)
     : BaseTransport("websocket"),
-      handler_(new WebsocketHandler(convert_to_std(handler->GetConn()->name()))),
+      handler_(new WebsocketHandler(ConvertToStd(handler->GetConn()->name()))),
       writable_(false),
       upgraded_(false) {
 }
@@ -78,10 +80,11 @@ void WebsocketTransport::OnBinaryMessage(const WebsocketHandlerPtr& handler,
 
 void WebsocketTransport::OnCloseMessage(const WebsocketHandlerPtr& handler,
                                         const CloseMessage& message) {
-  OnClose();  
+  ForceClose();
 }
 
 void WebsocketTransport::OnClose() {
+  LOG(DEBUG) << "WebsocketTransport::OnClose";
   BaseTransport::OnClose();
 }
 

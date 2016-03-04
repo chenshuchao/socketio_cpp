@@ -21,12 +21,32 @@ void DecodePacketBody(string& body, vector<string>& v) {
   }
 }
 
+string& ArrayStringify(vector<string>& vec, string& res) {
+  res.clear();
+  res += "[";
+  for (int i = 0, size = vec.size(); i < size; i ++) {
+    LOG(DEBUG) << "vec:" << i << ", "
+               << vec[i] << ", " << vec[i][0];
+    if (vec[i].size() && vec[i][0] != '{' && vec[i][0] != '[') {
+      res += "\"" + vec[i] + "\"";
+    } else {
+      res += vec[i];
+    }
+    if (i != size - 1) res += ",";
+  }
+  res += "]";
+  return res;
+}
+
 void EncodePacketBody(const string& event, const string& body, string& result) {
-  result = "[\"" + event + "\",\"" + body + "\"]";
+  vector<string> v;
+  v.push_back(event);
+  v.push_back(body);
+  ArrayStringify(v, result);
 }
 
 Socket::Socket(const ClientPtr& client, const NamespacePtr& nsp)
-    : id_(client->GetID()),
+    : sid_(client->GetSid()),
       client_wptr_(client),
       nsp_wptr_(nsp) {
 }
@@ -38,6 +58,7 @@ Socket& Socket::On(const std::string& event, const EventCallback& cb) {
 }
 
 void Socket::Emit(const string& event, const std::string& data) {
+  LOG(DEBUG) << "Socket::Emit - Event: " << event << "data: " << data;
   Packet packet;
   // TODO BINARY
   string body;
@@ -82,7 +103,7 @@ void Socket::OnPacket(const Packet& packet) {
       break;
     }
     case Packet::kTypeDisconnect: {
-      ForceClose();
+      Close();
     }
     case Packet::kTypeError: {
       OnError(packet.GetBody());
@@ -90,6 +111,42 @@ void Socket::OnPacket(const Packet& packet) {
   }
 }
 
+void Socket::Join(const string& room) {
+  NamespacePtr nsp = nsp_wptr_.lock();
+  // TODO assert or report error?
+  assert(nsp);
+  nsp->Join(sid_, room);
+}
+
+void Socket::Leave(const string& room) {
+  NamespacePtr nsp = nsp_wptr_.lock();
+  assert(nsp);
+  nsp->Leave(sid_, room);
+}
+
+void Socket::Broadcast(const string& room, const string& event, const string& data) {
+  NamespacePtr nsp = nsp_wptr_.lock();
+  assert(nsp);
+  nsp->Broadcast(sid_, room, event, data);
+}
+
+void Socket::Close() {
+  if (close_callback_) {
+    close_callback_();
+  }
+  if (close_callback_with_this_) {
+    close_callback_with_this_(shared_from_this());
+  }
+  ClientPtr client = client_wptr_.lock();
+  if (client) {
+    client->Remove(shared_from_this());
+  }
+}
+
+
+// socket.broadcast
+// nsp.broadcast(emit);
+// adaper.broadcast check socket is joined.
 void Socket::OnEventPacket(const Packet& packet) {
   int id = packet.GetID();
   if (id > 0) {
@@ -123,17 +180,8 @@ void Socket::SendPacket(const Packet& packet) {
   client->SendPacket(packet);
 }
 
-void Socket::ForceClose() {
-  ClientPtr client = client_wptr_.lock();
-  if (!client) {
-    //
-    return;
-  }
-  client->ForceClose();
-}
-
 void Socket::OnError(const string& what) {
   LOG(ERROR) << "Socket::OnError - " << what;
-  ForceClose();
+  Close();
 }
 

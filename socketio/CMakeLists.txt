@@ -1,4 +1,5 @@
 SET(socketio_SRCS
+  adapter.cc
   client.cc
   namespace.cc
   packet.cc

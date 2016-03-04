@@ -16,7 +16,7 @@ static inline bool IsBase64(unsigned char c) {
   return (isalnum(c) || (c == '+') || (c == '/'));
 }
 
-string Base64Encode(unsigned char const* bytes_to_encode, unsigned int in_len) {
+inline string Base64Encode(unsigned char const* bytes_to_encode, unsigned int in_len) {
   string ret;
   int i = 0;
   int j = 0;
@@ -56,12 +56,12 @@ string Base64Encode(unsigned char const* bytes_to_encode, unsigned int in_len) {
   return ret;
 }
 
-string Base64Encode(const string& message)
+inline string Base64Encode(const string& message)
 {
   return Base64Encode((unsigned char*)message.c_str(), message.size());
 }
 
-string Base64Decode(string const& encoded_string) {
+inline string Base64Decode(string const& encoded_string) {
   int in_len = encoded_string.size();
   int i = 0;
   int j = 0;
@@ -101,7 +101,7 @@ string Base64Decode(string const& encoded_string) {
   return ret;
 }
 
-void ReverseBytes(int x, unsigned char* bytes, int index)
+inline void ReverseBytes(int x, unsigned char* bytes, int index)
 {
   bytes[index+0] = (x >> 24) & 0xFF;
   bytes[index+1] = (x >> 16) & 0xFF;
@@ -109,7 +109,7 @@ void ReverseBytes(int x, unsigned char* bytes, int index)
   bytes[index+3] = x & 0xFF; 
 }
 
-string Sha1(string buf)
+inline string Sha1(string buf)
 {
   unsigned int digest[5];
   boost::uuids::detail::sha1 boost_sha1;

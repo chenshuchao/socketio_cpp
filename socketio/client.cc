@@ -9,7 +9,8 @@ using namespace socketio;
 
 Client::Client(Server* server, const engineio::SocketPtr& socket)
     : server_(server),
-      eio_socket_(socket) {
+      eio_socket_(socket),
+      id_(socket->GetSid()){
   eio_socket_->SetMessageCallback(
       boost::bind(&Client::OnMessage, this, _1, _2));
   eio_socket_->SetPingCallback(boost::bind(&Client::OnPing, this, _1, _2));
@@ -48,6 +49,14 @@ void Client::ForceClose() {
   eio_socket_->ForceClose();
 }
 
+void Client::Remove(const SocketPtr& socket) {
+  String2SocketPtr::iterator it = sockets_.find(socket->GetSid());
+  if (it != sockets_.end()) {
+    LOG(DEBUG) << "Client::Remove - Socket reomve, sid: " << socket->GetSid();
+    sockets_.erase(it);
+  }
+}
+
 void Client::OnData(const string& data) {
   LOG(DEBUG) << "Client::OnData.";
   Packet packet;
@@ -55,7 +64,7 @@ void Client::OnData(const string& data) {
   if (packet.GetType() == Packet::kTypeConnect) {
     Connect(packet.GetNamespace());
   } else {
-    map<string, SocketPtr>::const_iterator it =
+    String2SocketPtr::const_iterator it =
         sockets_.find(packet.GetNamespace());
     if (it == sockets_.end()) {
       // error
@@ -73,6 +82,11 @@ void Client::OnPing(const engineio::SocketPtr& socket, const string& data) {
 }
 
 void Client::OnClose() {
+  for (String2SocketPtr::iterator it = sockets_.begin();
+       it != sockets_.end();
+       it ++) {
+    it->second->Close();
+  }
   close_callback_(shared_from_this());
 }
 

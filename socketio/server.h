@@ -14,6 +14,7 @@ namespace socketio {
 
 class Server : public woody::HTTPApplication {
  public:
+  typedef std::map<std::string, ClientPtr> String2ClientPtr;
   Server(const std::string& name);
 
   virtual void HandleRequest(const woody::HTTPHandlerPtr& handler,
@@ -22,6 +23,10 @@ class Server : public woody::HTTPApplication {
 
   void SetSocketConnectCallback(const SocketConnectCallback& cb) {
     socket_connect_callback_ = cb;
+  }
+
+  void SetAdapterFactory(const AdapterFactory& factory) {
+    adapter_factory_ = factory;
   }
 
   void SetPathPrefix(const std::string& prefix) {
@@ -53,7 +58,8 @@ class Server : public woody::HTTPApplication {
   // {Socket_name, ClientPtr}
   SocketConnectCallback socket_connect_callback_;
   std::map<std::string, NamespacePtr> nsps_;
-  std::map<std::string, ClientPtr> clients_;
+  String2ClientPtr clients_;
+  AdapterFactory adapter_factory_;
 };
 }
 

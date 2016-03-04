@@ -12,4 +12,4 @@ SET(engineio_SRCS
 
 ADD_LIBRARY(engineio ${engineio_SRCS})
 
-TARGET_LINK_LIBRARIES(engineio woody_http woody_websocket woody_base muduo_net muduo_base pthread)
+TARGET_LINK_LIBRARIES(engineio woody_http woody_websocket muduo_net muduo_base pthread)
