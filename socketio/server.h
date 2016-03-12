@@ -21,18 +21,22 @@ class Server : public woody::HTTPApplication {
                              const woody::HTTPRequest& request,
                              woody::HTTPResponse& resp);
 
+  // Set callback when a socketio::Socket connects.
   void SetSocketConnectCallback(const SocketConnectCallback& cb) {
     socket_connect_callback_ = cb;
   }
 
+  // Set broadcast adapter factory.
   void SetAdapterFactory(const AdapterFactory& factory) {
     adapter_factory_ = factory;
   }
 
+  // Set http request url path prefix, defalut to "/engine.io".
   void SetPathPrefix(const std::string& prefix) {
     eio_server_.SetPathPrefix(prefix);
   }
 
+  // Set cookie prefix, default to "io".
   void SetCookiePrefix(const std::string& prefix) {
     eio_server_.SetCookiePrefix(prefix);
   }
@@ -45,13 +49,16 @@ class Server : public woody::HTTPApplication {
     eio_server_.SetPingTimeout(time);
   }
 
+  // 
   void Of(std::string nsp_name);
 
   NamespacePtr GetNamespace(const std::string& nsp_name);
 
  private:
+  // Call when a engineio::Socket connects.
   void OnConnection(const engineio::SocketPtr& socket);
 
+  // Call when a socketio::Client close.
   void OnClientClose(const ClientPtr& client);
 
   engineio::Server eio_server_;

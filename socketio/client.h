@@ -26,10 +26,10 @@ class Client : public boost::enable_shared_from_this<Client> {
 
   std::string GetSid() const { return id_; }
 
+  // Try to connect a namespace.
   bool Connect(const std::string& nsp_name);
 
-  void Emit(const std::string& event, const std::string& data);
-
+  // Send socketio::Packet content to client.
   void SendPacket(const Packet& packet);
 
   void SetSocketConnectCallback(const SocketConnectCallback& cb) {
@@ -41,13 +41,16 @@ class Client : public boost::enable_shared_from_this<Client> {
 
   void ForceClose();
 
+  // Remove engineio::Socket.
   void Remove(const SocketPtr& socket);
 
  private:
   void OnData(const std::string& data);
 
+  // Call when engineio gets a text engineio::Packet.
   void OnMessage(const engineio::SocketPtr& socket, const std::string& data);
 
+  // Call when engineio gets a ping engineio::Packet.
   void OnPing(const engineio::SocketPtr& socket, const std::string& data);
 
   void Send(const std::string& data) {

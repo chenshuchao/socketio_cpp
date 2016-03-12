@@ -6,6 +6,7 @@
 class SimpleChat {
  public:
   void OnConnection(const SocketPtr& socket) {
+    // Bind Event listener.
     socket->On("chat message",
                boost::bind(&SimpleChat::OnChatMessage, this, _1, _2));
   }
@@ -22,6 +23,7 @@ sio_server.SetSocketConnectCallback(
     boost::bind(&SimpleChat::OnConnection, &simple_chat, _1));
 
 ```
+[更多示例](https://github.com/chenshuchao/socketio_cpp/tree/master/example)
 
 
 ##安装
@@ -35,8 +37,4 @@ cd build
 cmake ..
 make
 ```
-执行示例
 
-    ./bin/simple ../example/simple
-    
-浏览器访问 http://127.0.0.1:5011/index.html (请使用 chrome 等高级浏览器）

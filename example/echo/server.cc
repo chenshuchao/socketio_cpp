@@ -61,7 +61,7 @@ class SimpleChat {
   }
  private:
   void OnChatMessage(const SocketPtr& socket, const string& data) {
-    socket->Emit("chat message", "From server: " + data);
+    socket->Emit("chat message", data);
   }
 };
 

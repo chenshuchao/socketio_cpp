@@ -24,20 +24,26 @@ class Socket : public boost::enable_shared_from_this<Socket> {
   typedef boost::function<void ()> CloseCallback;
   Socket(const ClientPtr& client, const NamespacePtr& nsp);
 
+  // Add Event listener.
   Socket& On(const std::string& event, const EventCallback& cb);
 
+  // Emit to client.
   void Emit(const std::string& event, const std::string& data);
 
   std::string GetSid() const { return sid_; }
 
   void OnConnect();
 
+  // Call when a socketio::Packet was parsed from socketio::Client.
   void OnPacket(const Packet& packet);
 
+  // Join a room.
   void Join(const std::string& room);
 
+  // Leave a room.
   void Leave(const std::string& room);
 
+  // broadcast message in a room.
   void Broadcast(const std::string& room,
                  const std::string& event,
                  const std::string& data);
@@ -53,7 +59,9 @@ class Socket : public boost::enable_shared_from_this<Socket> {
 
  private:
   void OnEventPacket(const Packet& packet);
+
   void OnAckPacket(const Packet& packet);
+
   void OnError(const std::string& data);
 
   void SendPacket(const Packet& packet);

@@ -104,9 +104,11 @@ void Socket::OnPacket(const Packet& packet) {
     }
     case Packet::kTypeDisconnect: {
       Close();
+      break;
     }
     case Packet::kTypeError: {
       OnError(packet.GetBody());
+      break;
     }
   }
 }
