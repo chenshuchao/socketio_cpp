@@ -10,6 +10,10 @@
 #include "socketio/packet.h"
 #include "socketio/callback.h"
 
+namespace Json {
+class Value;
+}
+
 namespace socketio {
 class Client;
 class Namespace;
@@ -28,7 +32,7 @@ class Socket : public boost::enable_shared_from_this<Socket> {
   Socket& On(const std::string& event, const EventCallback& cb);
 
   // Emit to client.
-  void Emit(const std::string& event, const std::string& data);
+  void Emit(const std::string& event, Json::Value& value);
 
   std::string GetSid() const { return sid_; }
 
@@ -46,7 +50,7 @@ class Socket : public boost::enable_shared_from_this<Socket> {
   // broadcast message in a room.
   void Broadcast(const std::string& room,
                  const std::string& event,
-                 const std::string& data);
+                 Json::Value& value);
 
   void SetCloseCallback(const CloseCallback& cb) {
     close_callback_ = cb;
@@ -58,7 +62,7 @@ class Socket : public boost::enable_shared_from_this<Socket> {
   void Close();
 
  private:
-  void OnEventPacket(const Packet& packet);
+  bool OnEventPacket(const Packet& packet);
 
   void OnAckPacket(const Packet& packet);
 

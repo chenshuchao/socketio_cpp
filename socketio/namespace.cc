@@ -32,7 +32,7 @@ void Namespace::Leave(const string& id, const string& room) {
 void Namespace::Broadcast(const string& id,
                           const string& room,
                           const string& event,
-                          const string& data) {
-  adapter_->Broadcast(id, room, event, data);
+                          Json::Value& value) {
+  adapter_->Broadcast(id, room, event, value);
 }
 

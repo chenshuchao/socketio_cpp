@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 
+#include <jsoncpp/json/json.h>
 #include <bytree/logging.hpp>
 #include <socketio/server.h>
 #include <woody/http/http_server.h>
@@ -61,7 +62,9 @@ class SimpleChat {
   }
  private:
   void OnChatMessage(const SocketPtr& socket, const string& data) {
-    socket->Emit("chat message", data);
+    Json::Value v(Json::stringValue);
+    v = data;
+    socket->Emit("chat message", v);
   }
 };
 

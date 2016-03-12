@@ -58,13 +58,9 @@ void Adapter::DelAll(const string& id) {
 bool Adapter::Broadcast(const string& sender_id,
                         const string& room,
                         const string& event,
-                        const string& data) {
+                        Json::Value& value) {
   //NamespacePtr nsp = nsp_wptr_.lock();
-  LOG(DEBUG) << "Adapter::Broadcast - "
-             << "Sender sid: " << sender_id
-             << ", room: " << room
-             << ", event: " << event
-             << ", data: " << data;
+  LOG(DEBUG) << "Adapter::Broadcast.";
   assert(nsp_);
   map<string, String2Bool>::iterator it = rooms_.find(room);
   if (it == rooms_.end()) {
@@ -82,7 +78,7 @@ bool Adapter::Broadcast(const string& sender_id,
       LOG(ERROR) << "Adapter::Broadcast - socket not found, sid: " << inner_it->first;
       return false;
     }
-    socket->Emit(event, data);
+    socket->Emit(event, value);
   }
   return true;
 }

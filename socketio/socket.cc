@@ -1,5 +1,6 @@
 #include "socketio/socket.h"
 
+#include <jsoncpp/json/json.h>
 #include <bytree/logging.hpp>
 #include <bytree/string_util.hpp>
 
@@ -9,18 +10,7 @@
 using namespace std;
 using namespace bytree;
 using namespace socketio;
-
-void DecodePacketBody(string& body, vector<string>& v) {
-  Trim(body);
-  LTrim(body, '[');
-  RTrim(body, ']');
-  Split(body, ",", v);
-  for (int i = 0, len = v.size(); i < len; i++) {
-    Trim(v[i]);
-    Trim(v[i], '\"');
-  }
-}
-
+/*
 string& ArrayStringify(vector<string>& vec, string& res) {
   res.clear();
   res += "[";
@@ -39,12 +29,9 @@ string& ArrayStringify(vector<string>& vec, string& res) {
 }
 
 void EncodePacketBody(const string& event, const string& body, string& result) {
-  vector<string> v;
-  v.push_back(event);
-  v.push_back(body);
-  ArrayStringify(v, result);
+  //ArrayStringify(v, result);
 }
-
+*/
 Socket::Socket(const ClientPtr& client, const NamespacePtr& nsp)
     : sid_(client->GetSid()),
       client_wptr_(client),
@@ -57,12 +44,17 @@ Socket& Socket::On(const std::string& event, const EventCallback& cb) {
   return *this;
 }
 
-void Socket::Emit(const string& event, const std::string& data) {
-  LOG(DEBUG) << "Socket::Emit - Event: " << event << "data: " << data;
+void Socket::Emit(const string& event, Json::Value& value) {
   Packet packet;
   // TODO BINARY
-  string body;
-  EncodePacketBody(event, data, body);
+
+  Json::StyledWriter writer;
+  Json::Value vec(Json::arrayValue);
+  vec.append(event);
+  vec.append(value);
+  string body = writer.write(vec);
+  LOG(DEBUG) << "EcodePacketBody - " << body;
+
   packet.SetType(Packet::kTypeEvent)
         .SetBody(body);
   NamespacePtr nsp = nsp_wptr_.lock();
@@ -126,10 +118,10 @@ void Socket::Leave(const string& room) {
   nsp->Leave(sid_, room);
 }
 
-void Socket::Broadcast(const string& room, const string& event, const string& data) {
+void Socket::Broadcast(const string& room, const string& event, Json::Value& value) {
   NamespacePtr nsp = nsp_wptr_.lock();
   assert(nsp);
-  nsp->Broadcast(sid_, room, event, data);
+  nsp->Broadcast(sid_, room, event, value);
 }
 
 void Socket::Close() {
@@ -149,25 +141,36 @@ void Socket::Close() {
 // socket.broadcast
 // nsp.broadcast(emit);
 // adaper.broadcast check socket is joined.
-void Socket::OnEventPacket(const Packet& packet) {
+bool Socket::OnEventPacket(const Packet& packet) {
   int id = packet.GetID();
   if (id > 0) {
   }
   string body = packet.GetBody();
-
-  vector<string> v;
-  DecodePacketBody(body, v);
-  // TODO 
-  if (v.size() < 2) return; 
-  EventCallback cb = events_[v[0]];
-  LOG(DEBUG) << "Socket::OnEventPacket - Event: " << v[0]
-             << "data: " << v[1];
+  LOG(DEBUG) << "Socket::OnEventPacket - Packet body: " << body;
+  Json::Reader reader;
+  Json::Value root;
+  if (!reader.parse(body, root)) {
+    LOG(ERROR) << "Socket::OnEventPacket - Json parse error.";
+    return false;
+  }
+  if (!root.isArray()) {
+    LOG(ERROR) << "Socket::OnEventPacket - Not an array json.";
+    return false;
+  }
+  if (root.size() < 2) {
+    LOG(ERROR) << "Socket::OnEventPacket - Json array size error.";
+    return false;
+  }
+  EventCallback cb = events_[root[0].asString()];
+  LOG(DEBUG) << "Socket::OnEventPacket - Event: " << root[0].asString()
+             << "data: " << root[1].asString();
   if (!cb) {
     LOG(DEBUG) << "Socket::OnEventPacket - "
-               << "No event register, event name: " << v[0] << ".";
-    return;
+               << "No event register, event name: " << root[0].asString() << ".";
+    return false;
   }
-  cb(shared_from_this(), v[1]);
+  cb(shared_from_this(), root[1].asString());
+  return true;
 }
 
 void Socket::OnAckPacket(const Packet& packet) {

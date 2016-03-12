@@ -2,9 +2,9 @@
 #include <fstream>
 #include <string>
 
+#include <jsoncpp/json/json.h>
 #include <bytree/logging.hpp>
 #include <bytree/string_util.hpp>
-#include <bytree/json/json_codec.hpp>
 #include <socketio/server.h>
 #include <woody/http/http_server.h>
 #include <woody/http/http_application.h>
@@ -105,10 +105,10 @@ class ChatRoom {
     
     if (m.IsAddedUser()) {
       usernum_ --;
-      JsonCodec codec;
-      codec.Add("username", m.GetUsername())
-           .Add("numUsers", usernum_);
-      socket->Broadcast("chatroom", "user left", codec.Stringify());
+      Json::Value left_msg;
+      left_msg["username"] = m.GetUsername();
+      left_msg["numUsers"] = usernum_;
+      socket->Broadcast("chatroom", "user left", left_msg);
       members_.erase(socket->GetSid());
     }
     // mutex end
@@ -136,16 +136,14 @@ class ChatRoom {
     int cur_num = usernum_;
     // mutex end
 
-    JsonCodec codec;
-    codec.Add("numUsers", cur_num);
-    string login_resp = codec.Stringify();
-    LOG(DEBUG) << "OnAddUser - login_resp: " << login_resp;
-    socket->Emit("login", login_resp);
+    Json::Value login_msg;
+    login_msg["numUsers"] = cur_num;
+    socket->Emit("login", login_msg);
 
-    JsonCodec codec2;
-    codec2.Add("username", username)
-          .Add("numUsers", cur_num);
-    socket->Broadcast("chatroom", "user joined", codec2.Stringify());
+    Json::Value join_msg;
+    join_msg["username"] = username;
+    join_msg["numUsers"] = cur_num;
+    socket->Broadcast("chatroom", "user joined", join_msg);
   }
 
   // Called when client call socket->emit("new message", data);
@@ -158,10 +156,10 @@ class ChatRoom {
     }
     Member m = it->second;
     // mutex end.
-    JsonCodec codec;
-    codec.Add("username", m.GetUsername())
-         .Add("message", data);
-    socket->Broadcast("chatroom", "new message", codec.Stringify());
+    Json::Value new_msg;
+    new_msg["username"] = m.GetUsername();
+    new_msg["message"] = data;
+    socket->Broadcast("chatroom", "new message", new_msg);
   }
 
   unsigned int usernum_;

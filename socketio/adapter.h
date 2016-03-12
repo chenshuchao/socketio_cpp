@@ -5,6 +5,7 @@
 #include <map>
 
 #include <boost/weak_ptr.hpp>
+#include <jsoncpp/json/json-forwards.h>
 
 namespace socketio {
 class Namespace;
@@ -25,7 +26,7 @@ class Adapter {
   virtual bool Broadcast(const std::string& sender_id,
                          const std::string& room,
                          const std::string& event,
-                         const std::string& data);
+                         Json::Value& value);
 
  private:
   Namespace *nsp_;

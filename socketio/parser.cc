@@ -43,7 +43,6 @@ bool Parser::DecodeString(const string& data, Packet& packet) {
   } else {
     packet.SetNamespace("/");
   }
-  i ++;
   
   if (i < size && isdigit(data[i])) {
     int j = i+1;
@@ -57,10 +56,6 @@ bool Parser::DecodeString(const string& data, Packet& packet) {
 
   string body(data, i);
   packet.SetBody(body);
-  /*
-  JsonCodec codec;
-  codec.Parse(body);
-  */
   return true;
 }
 

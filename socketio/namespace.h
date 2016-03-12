@@ -33,7 +33,7 @@ class Namespace {
   void Broadcast(const std::string& id,
                  const std::string& room,
                  const std::string& event,
-                 const std::string& data);
+                 Json::Value& value);
 
  private:
   const std::string name_;

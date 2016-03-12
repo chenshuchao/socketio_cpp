@@ -1,9 +1,9 @@
 #include "engineio/server.h"
 
 #include <fstream>
+#include <jsoncpp/json/json.h>
 #include <bytree/logging.hpp>
 #include <bytree/string_util.hpp>
-#include <bytree/json/json_codec.hpp>
 
 #include "engineio/base/util.h"
 #include "engineio/transports/websocket.h"
@@ -91,14 +91,22 @@ void Server::Handshake(const HTTPHandlerPtr& handler,
   socket->HandleRequest(handler, req, resp);
 
   string body;
-  JsonCodec codec;
+  Json::StyledWriter writer;
+  Json::Value root(Json::objectValue);
+
   vector<string> upgrades;
   tran->GetAllUpgrades(upgrades);
-  codec.Add("sid", sid)
-       .Add("upgrades", upgrades)
-       .Add("pingInterval", ping_interval_)
-       .Add("pingTimeout", ping_timeout_);
-  socket->SendOpenPacket(codec.Stringify());
+  Json::Value vec(Json::arrayValue);
+  for (unsigned int i = 0; i < upgrades.size(); i ++) {
+    vec.append(upgrades[i]);
+  }
+
+  root["sid"] = sid;
+  root["upgrades"] = vec;
+  root["pingInterval"] = ping_interval_;
+  root["pingTimeout"] = ping_timeout_;
+
+  socket->SendOpenPacket(writer.write(root));
 
   if (connection_callback_) {
     connection_callback_(socket);
@@ -163,12 +171,12 @@ void Server::HandleRequestError(const HTTPHandlerPtr& handler,
     resp.AddHeader("Access-Control-Allow-Origin", "*");
   }
  
-  JsonCodec codec;
-  codec.Add("code", code);
-  //const char* message =;
-  codec.Add("message", kErrorMessage[code]);
+  Json::StyledWriter writer;
+  Json::Value root;
+  root["code"] = code;
+  root["message"] = kErrorMessage[code];
 
-  resp.AddBody(codec.Stringify());
+  resp.AddBody(writer.write(root));
   resp.End();
 }
 
