@@ -12,7 +12,9 @@ class SimpleChat {
   }
  private:
   void OnChatMessage(const SocketPtr& socket, const string& data) {
-    socket->Emit("chat message", "From server: " + data);
+    Json::Value v(Json::stringValue);
+    v = data;
+    socket->Emit("chat message", v);
   }
 };
 

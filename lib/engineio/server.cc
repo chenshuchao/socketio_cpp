@@ -59,7 +59,6 @@ void Server::Handshake(const HTTPHandlerPtr& handler,
                        const HTTPRequest& req,
                        HTTPResponse& resp,
                        const string& transport_name) {
-  // TODO find whether repeat?
   string sid;
   while(true) {
     sid = GenerateBase64ID();
