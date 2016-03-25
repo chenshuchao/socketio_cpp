@@ -86,6 +86,7 @@ void Server::Handshake(const HTTPHandlerPtr& handler,
       boost::bind(&Server::OnMessage, this, _1, _2));
   socket->SetPingCallback(
       boost::bind(&Server::OnPingMessage, this, _1, _2));
+  // FIXME thread safe
   sockets_[sid] = socket;
   socket->HandleRequest(handler, req, resp);
 

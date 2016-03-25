@@ -109,18 +109,16 @@ void WebsocketHandler::OnData(const muduo::net::TcpConnectionPtr& conn,
   LOG(INFO) << "WebsocketHandler::OnData [" << GetName()
             << "] - protocol: Websocket.";
   while (buf->readableBytes() > 0) {
-    string data = ConvertToStd(buf->retrieveAllAsString());
+    string data(buf->peek(), buf->readableBytes());
+    LOG(DEBUG) << "data: " << data << ", data_size: " << data.size();
     size_t parsed_bytes = 0;
     // It means codec error or we need to wait for more data.
     if (!ws_codec_.OnData(data, parsed_bytes) ||
         !parsed_bytes) {
       break; 
     }
-    string unparsed_str(data, parsed_bytes);
-    LOG(DEBUG) << "unparsed bytes" << unparsed_str.size()
-               << "unparsed_str : " << unparsed_str;
-    buf->prepend(unparsed_str.c_str(), unparsed_str.size());
-    LOG(DEBUG) << "readable bytes: " << buf->readableBytes();
+    LOG(DEBUG) << "unparsed bytes" << buf->readableBytes() - parsed_bytes;
+    buf->retrieve(parsed_bytes);
   }
 }
 

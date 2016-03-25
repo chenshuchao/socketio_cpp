@@ -40,17 +40,13 @@ void HTTPHandler::OnData(const muduo::net::TcpConnectionPtr& conn,
   LOG(DEBUG) << "HTTPHandler::OnData [" << GetName()
            << "] - protocol: HTTP.";
   while (buf->readableBytes() > 0) {
-    string data = ConvertToStd(buf->retrieveAllAsString());
-    size_t bytes_parsed = codec_.OnData(data);
-    if (!bytes_parsed) {
+    string data(buf->peek(), buf->readableBytes());
+    size_t parsed_bytes = codec_.OnData(data);
+    if (!parsed_bytes) {
       // It means we need to wait for more data.
       break; 
     }
-    string unparsed_str(data, bytes_parsed);
-    LOG(DEBUG) << "unparsed bytes" << unparsed_str.size()
-               << "unparsed_str : " << unparsed_str;
-    buf->prepend(unparsed_str.c_str(), unparsed_str.size());
-    LOG(DEBUG) << "readable bytes: " << buf->readableBytes();
+    buf->retrieve(parsed_bytes);
   }
 }
 

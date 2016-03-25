@@ -1,4 +1,4 @@
-#define LOG_LEVEL DEBUG
+#define LOGGING_LEVEL INFO
 #include <fstream>
 #include <string>
 
@@ -63,7 +63,7 @@ class SimpleChat {
  private:
   void OnChatMessage(const SocketPtr& socket, const string& data) {
     Json::Value v(Json::stringValue);
-    v = data;
+    v = "From sever: " + data;
     socket->Emit("chat message", v);
   }
 };
