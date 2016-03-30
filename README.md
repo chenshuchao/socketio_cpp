@@ -3,11 +3,11 @@
 
 ##使用
 
-### 依赖软件
+### 依赖
 
-g++ (version >= 4.4 is recommended);
-cmake (version >= 2.6 is recommended);
-boost (version >= 1.59 is recommended);
++ g++ (version >= 4.4 is recommended)
++ cmake (version >= 2.6 is recommended)
++ boost (version >= 1.59 is recommended)
 
 ###下载编译
 ```
@@ -23,7 +23,7 @@ cd build/release
 ```
 浏览器访问 http://127.0.0.1:5011/index.html (请使用 chrome 等高级浏览器）
 
-###安装项目
+###安装
 ```
 cd bulid/release
 make install
@@ -63,15 +63,13 @@ int main(int argc, char** argv) {
 ```
 [详细示例]
 
-
 ## 代码详解
 [socketio_cpp详解]
 
+## benchmark(TODO)
+[branch](https://github.com/chenshuchao/socketio_cpp/tree/benchmark)
 
 [socket.io]:https://github.com/socketio/socket.io
 [详细示例]:https://github.com/chenshuchao/socketio_cpp/tree/master/example
 [socketio_cpp详解]:http://shuchao.me/2016/03/13/socketio_cpp%E8%AF%A6%E8%A7%A3/
-
-## benchmark(TODO)
-[branch](https://github.com/chenshuchao/socketio_cpp/tree/benchmark)
 
