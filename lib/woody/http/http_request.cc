@@ -42,11 +42,8 @@ void HTTPRequest::SetUrl(const std::string& url) {
 }
 
 void HTTPRequest::SetMethod(const string& method) {
-  //todo check method
-  string temp(method);
-  //method_ = boost::to_upper_copy<string>(temp);
-  cout << method_ << endl;
-  method_ = temp;
+  //TODO check method
+  method_ = method;
   return;
 }
 

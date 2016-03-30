@@ -1,7 +1,8 @@
 #include "socketio/namespace.h"
+#include "socketio/socket.h"
 
 using namespace std;
-using namespace woody;
+//using namespace woody;
 using namespace socketio;
 
 void Namespace::AddSocket(const SocketPtr& socket) {

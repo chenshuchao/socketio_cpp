@@ -4,9 +4,10 @@
 
 #include <jsoncpp/json/json.h>
 #include <bytree/logging.hpp>
-#include <socketio/server.h>
 #include <woody/http/http_server.h>
 #include <woody/http/http_application.h>
+#include <socketio/server.h>
+#include <socketio/socket.h>
 
 using namespace std;
 using namespace socketio;

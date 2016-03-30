@@ -1,17 +1,20 @@
 #ifndef SOCKETIO_CLIENT_H
 #define SOCKETIO_CLIENT_H
 
+#include <map>
+
 #include <boost/weak_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <engineio/socket.h>
 
-#include "socketio/socket.h"
-#include "socketio/parser.h"
 #include "socketio/callback.h"
 
 namespace socketio {
 class Server;
+class Socket;
 class NamespaceManager;
+class Packet;
+typedef boost::shared_ptr<Socket> SocketPtr;
 typedef boost::shared_ptr<NamespaceManager> NamespaceManagerPtr;
 
 class Client : public boost::enable_shared_from_this<Client> {

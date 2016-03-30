@@ -5,7 +5,6 @@
 #include <boost/shared_ptr.hpp>
 
 #include "socketio/callback.h"
-#include "socketio/client.h"
 #include "socketio/adapter.h"
 
 namespace socketio {

@@ -7,10 +7,13 @@
 #include <muduo/net/EventLoop.h>
 #include <muduo/net/TcpServer.h>
 
-#include "woody/http/http_handler.h"
+#include "woody/http/http_request.h"
+#include "woody/http/http_response.h"
 
 namespace woody {
 class HTTPApplication;
+class HTTPHandler;
+typedef boost::shared_ptr<HTTPHandler> HTTPHandlerPtr;
 class HTTPServer : boost::noncopyable {
  public:
   HTTPServer(int port, const std::string& name);

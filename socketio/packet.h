@@ -1,6 +1,8 @@
 #ifndef SOCKETIO_PACKET_H
 #define SOCKETIO_PACKET_H
 
+#include <string>
+
 namespace socketio {
 class Packet {
  public:

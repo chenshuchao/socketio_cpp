@@ -6,6 +6,8 @@
 
 #include "socketio/namespace.h"
 #include "socketio/callback.h"
+#include "socketio/client.h"
+#include "socketio/packet.h"
 
 using namespace std;
 using namespace bytree;

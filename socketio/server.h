@@ -8,7 +8,6 @@
 
 #include "socketio/callback.h"
 #include "socketio/namespace.h"
-#include "socketio/client.h"
 
 namespace socketio {
 

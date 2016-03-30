@@ -8,4 +8,6 @@ SET(woody_websocket_SRCS
   )
 
 ADD_LIBRARY(woody_websocket ${woody_websocket_SRCS})
+TARGET_LINK_LIBRARIES(woody_websocket muduo_net)
+INSTALL(TARGETS woody_websocket DESTINATION lib)
 

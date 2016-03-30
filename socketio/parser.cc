@@ -1,6 +1,7 @@
 #include "socketio/parser.h"
 
 #include <bytree/string_util.hpp>
+#include "socketio/packet.h"
 
 using namespace std;
 using namespace bytree;

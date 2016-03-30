@@ -3,6 +3,7 @@
 #include <bytree/logging.hpp>
 
 #include "socketio/namespace.h"
+#include "socketio/socket.h"
 
 using namespace std;
 using namespace bytree;

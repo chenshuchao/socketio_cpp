@@ -3,9 +3,8 @@
 
 #include <string>
 
-#include "socketio/packet.h"
-
 namespace socketio {
+class Packet;
 class Parser {
  public:
   static bool Decode(const std::string& data, Packet& packet);

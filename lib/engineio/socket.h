@@ -1,13 +1,28 @@
 #ifndef ENGINEIO_SOCKET_H
 #define ENGINEIO_SOCKET_H
 
+#include <vector>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/function.hpp>
 
-#include "engineio/transport.h"
-#include "engineio/transports/transport_factory.h"
+//#include "engineio/transport.h"
+//#include "engineio/transports/transport_factory.h"
+
+namespace woody {
+class HTTPHandler;
+class HTTPRequest;
+class HTTPResponse;
+typedef boost::shared_ptr<HTTPHandler> HTTPHandlerPtr;
+typedef boost::shared_ptr<HTTPRequest> HTTPRequestPtr;
+typedef boost::shared_ptr<HTTPResponse> HTTPResponsePtr;
+}
 
 namespace engineio {
+class BaseTransport;
+typedef boost::shared_ptr<BaseTransport> BaseTransportPtr;
+class Packet;
+
 class Socket : public boost::enable_shared_from_this<Socket> {
  public:
   typedef boost::shared_ptr<Socket> SocketPtr;
@@ -52,12 +67,9 @@ class Socket : public boost::enable_shared_from_this<Socket> {
                      const woody::HTTPRequest& req,
                      woody::HTTPResponse& resp);
 
-  void SendOpenPacket(const std::string& data) {
-    CreateAndSendPacket(Packet::kPacketOpen, data);
-  }
-  void SendMessage(const std::string& data) {
-    CreateAndSendPacket(Packet::kPacketMessage, data);
-  }
+  void SendOpenPacket(const std::string& data);
+
+  void SendMessage(const std::string& data);
 
   void ForceClose();
 
@@ -75,6 +87,7 @@ class Socket : public boost::enable_shared_from_this<Socket> {
 
   void OnUpgradePacket(const Packet& packet);
 
+  // TODO hide packet_type
   void CreateAndSendPacket(int packet_type, const std::string& data);
 
   // Handle upgrade request and wait for upgrade packet.
@@ -88,7 +101,6 @@ class Socket : public boost::enable_shared_from_this<Socket> {
   State state_;
   BaseTransportPtr transport_;
   BaseTransportPtr upgrading_transport_;
-  Transports transports_;
 
   CloseCallback close_callback_;
   CloseCallbackWithThis close_callback_with_this_;

@@ -1,6 +1,7 @@
 #ifndef WOODY_HTTP_HTTPREQUEST_H
 #define WOODY_HTTP_HTTPREQUEST_H
 
+#include <string>
 #include <map>
 #include <boost/shared_ptr.hpp>
 

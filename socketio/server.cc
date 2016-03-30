@@ -7,6 +7,8 @@ using namespace std;
 using namespace woody;
 using namespace socketio;
 
+#include "socketio/client.h"
+
 Server::Server(const string& name)
     : eio_server_(name) { 
   eio_server_.SetConnectionCallback(

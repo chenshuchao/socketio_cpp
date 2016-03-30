@@ -3,6 +3,9 @@
 #include <bytree/logging.hpp>
 #include "socketio/server.h"
 #include "socketio/namespace.h"
+#include "socketio/socket.h"
+#include "socketio/parser.h"
+#include "socketio/packet.h"
 
 using namespace std;
 using namespace socketio;

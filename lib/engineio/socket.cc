@@ -1,6 +1,9 @@
 #include "engineio/socket.h"
 #include <bytree/logging.hpp>
 
+#include "engineio/transport.h"
+#include "engineio/transports/transport_factory.h"
+
 using namespace std;
 using namespace woody;
 using namespace engineio;
@@ -84,7 +87,8 @@ bool Socket::MaybeUpgrade(const HTTPHandlerPtr& handler,
   req.GetGETParams("transport", transport);
    
   // Get server transports
-  BaseTransportFactoryPtr factory = transports_.GetFactory(transport);
+  Transports transports;
+  BaseTransportFactoryPtr factory = transports.GetFactory(transport);
   BaseTransportPtr tran(factory->Create(handler, req, resp));
   tran->HandleRequest(handler, req, resp);
   upgrading_transport_ = tran;
@@ -92,6 +96,14 @@ bool Socket::MaybeUpgrade(const HTTPHandlerPtr& handler,
       boost::bind(&Socket::OnPacketWhenUpgrading, this, _1));
 
   return true;
+}
+
+void Socket::SendOpenPacket(const std::string& data) {
+  CreateAndSendPacket(Packet::kPacketOpen, data);
+}
+
+void Socket::SendMessage(const std::string& data) {
+  CreateAndSendPacket(Packet::kPacketMessage, data);
 }
 
 void Socket::ForceClose() {

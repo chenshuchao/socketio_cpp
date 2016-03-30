@@ -7,6 +7,7 @@
 
 #include "woody/base/base_util.h"
 #include "woody/http/http_application.h"
+#include "woody/http/http_handler.h"
 
 using namespace std;
 using namespace bytree;

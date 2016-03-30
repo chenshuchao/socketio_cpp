@@ -6,6 +6,7 @@
 #include <bytree/string_util.hpp>
 
 #include "engineio/base/util.h"
+#include "engineio/transports/transport_factory.h"
 #include "engineio/transports/websocket.h"
 
 using namespace std;
@@ -68,7 +69,8 @@ void Server::Handshake(const HTTPHandlerPtr& handler,
 
   resp.AddHeader("Set-Cookie", cookie_prefix_ + "=" + sid);
 
-  BaseTransportFactoryPtr factory = transports_.GetFactory(transport_name);
+  Transports transports;
+  BaseTransportFactoryPtr factory = transports.GetFactory(transport_name);
   BaseTransportPtr tran(factory->Create(handler, req, resp));
   
   // "b64" in request query means no supporting binary.
@@ -128,9 +130,10 @@ void Server::OnMessage(const SocketPtr& socket, const std::string& data) {
 bool Server::VerifyRequest(const HTTPHandlerPtr& handler,
                            const HTTPRequest& req,
                            HTTPResponse& resp) {
+  Transports transports;
   string transport;
   if (!(req.GetGETParams("transport", transport) &&
-       transports_.IsValid(transport))) {
+       transports.IsValid(transport))) {
     LOG(ERROR) << "Unknown transport : " << transport;
     HandleRequestError(handler, req, resp, kUnknownTransport);
     return false;

@@ -7,7 +7,6 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/weak_ptr.hpp>
 
-#include "socketio/packet.h"
 #include "socketio/callback.h"
 
 namespace Json {
@@ -18,6 +17,7 @@ namespace socketio {
 class Client;
 class Namespace;
 class NamespaceManager; 
+class Packet;
 typedef boost::shared_ptr<Client> ClientPtr;
 typedef boost::shared_ptr<Namespace> NamespacePtr;
 typedef boost::shared_ptr<NamespaceManager> NamespaceManagerPtr;

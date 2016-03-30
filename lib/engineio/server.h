@@ -5,7 +5,6 @@
 
 #include <woody/http/http_application.h>
 #include "engineio/socket.h"
-#include "engineio/transports/transport_factory.h"
 
 namespace engineio {
 class Server : public woody::HTTPApplication {
@@ -93,8 +92,6 @@ class Server : public woody::HTTPApplication {
   // {sid : socket}, for http request to find its sockets.
   std::map<std::string, SocketPtr> sockets_;
 
-  // { transport_name : transport_factory }
-  Transports transports_;
   MessageCallback message_callback_;
   MessageCallback ping_message_callback_;
   ConnectionCallback connection_callback_;
