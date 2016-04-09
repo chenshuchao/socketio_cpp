@@ -11,7 +11,7 @@ using namespace woody;
 
 HTTPHandler::HTTPHandler(const string& name,
                          const muduo::net::TcpConnectionPtr& conn)
-    : BaseHandler(), name_(name), conn_(conn) {
+    : BaseHandler(), name_(name), conn_(conn), is_dying_(false) {
   codec_.SetMessageBeginCallback(
       boost::bind(&HTTPHandler::OnMessageBegin, this, _1));
   codec_.SetMessageCompleteCallback(
@@ -48,20 +48,24 @@ void HTTPHandler::OnData(const muduo::net::TcpConnectionPtr& conn,
     }
     buf->retrieve(parsed_bytes);
   }
+  if (is_dying_) {
+    OnClose();
+  }
 }
 
 void HTTPHandler::OnMessageComplete(HTTPCodec::StreamID id, HTTPRequest& req) {
   LOG(DEBUG) << "HTTPHandler::OnMessageComplete []";
   HTTPResponse resp(shared_from_this());
   request_complete_callback_(shared_from_this(), req, resp);
+  codec_.CleanUp();
 }
 
 void HTTPHandler::OnClose() {
-  if (close_callback_with_this_) {
-    close_callback_with_this_(shared_from_this());
-  }
   if (close_callback_) {
     close_callback_();
+  }
+  if (close_callback_with_this_) {
+    close_callback_with_this_(shared_from_this());
   }
 }
 
