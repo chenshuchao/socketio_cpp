@@ -31,7 +31,7 @@ Server::Server(const string& name)
 void Server::HandleRequest(const HTTPHandlerPtr& handler, 
                            const HTTPRequest& req,
                            HTTPResponse& resp) {
-  LOG(DEBUG) << "Server::HandleReqeust - "
+  LOG(DEBUG) << "Server::HandleRequest - "
              << "method: " << req.GetMethod()
              << ", url: " << req.GetUrl();
   if (!path_prefix_.empty() &&
@@ -187,5 +187,6 @@ void Server::OnSocketClose(const SocketPtr& socket) {
   LOG(DEBUG) << "Server::OnSocketClose - "
             << socket->GetName();
   sockets_.erase(socket->GetSid());
+  LOG(DEBUG) << "Server::OnSocketClose - engine::sockets size:" << sockets_.size();
 }
 

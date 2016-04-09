@@ -85,6 +85,7 @@ void Client::OnPing(const engineio::SocketPtr& socket, const string& data) {
 }
 
 void Client::OnClose() {
+  LOG(DEBUG) << "Client::OnClose";
   for (String2SocketPtr::iterator it = sockets_.begin();
        it != sockets_.end();
        it ++) {

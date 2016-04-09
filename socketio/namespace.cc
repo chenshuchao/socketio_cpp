@@ -1,3 +1,4 @@
+#include <bytree/logging.hpp>
 #include "socketio/namespace.h"
 #include "socketio/socket.h"
 
@@ -9,9 +10,17 @@ void Namespace::AddSocket(const SocketPtr& socket) {
   string sid = socket->GetSid();
   map<string, SocketPtr>::const_iterator it = sockets_map_.find(sid);
   assert(it == sockets_map_.end());
-  sockets_.push_back(socket);
+  //sockets_.push_back(socket);
   sockets_map_[sid] = socket;
   socket->OnConnect();
+}
+
+void Namespace::RemoveSocket(const SocketPtr& socket) {
+  string sid = socket->GetSid();
+  map<string, SocketPtr>::iterator it = sockets_map_.find(sid);
+  if (it != sockets_map_.end()) {
+    sockets_map_.erase(it);
+  }
 }
 
 SocketPtr Namespace::GetSocket(const string& sid) {

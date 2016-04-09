@@ -61,6 +61,8 @@ void HTTPServer::OnConnection(const muduo::net::TcpConnectionPtr& conn) {
   HTTPHandlerPtr handler(new HTTPHandler(conn_name, conn));
   handler->SetRequestCompleteCallback(
       boost::bind(&HTTPServer::OnRequest, this, _1, _2, _3));
+  handler->SetCloseCallbackWithThis(
+      boost::bind(&HTTPServer::OnHandlerClose, this, _1));
   handler_map_.insert(pair<string, HTTPHandlerPtr>(conn_name, handler));
 }
 
