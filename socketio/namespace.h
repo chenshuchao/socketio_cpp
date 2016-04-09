@@ -23,8 +23,6 @@ class Namespace {
 
   void AddSocket(const SocketPtr& socket);
 
-  void RemoveSocket(const SocketPtr& socket);
-
   SocketPtr GetSocket(const std::string& sid);
 
   void Join(const std::string& id, const std::string& room);
@@ -39,7 +37,7 @@ class Namespace {
  private:
   const std::string name_;
   int id_;
-  //std::vector<SocketPtr> sockets_;
+  std::vector<SocketPtr> sockets_;
 
   std::map<std::string, SocketPtr> sockets_map_;
   AdapterPtr adapter_;

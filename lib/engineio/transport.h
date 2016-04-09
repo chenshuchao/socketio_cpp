@@ -2,6 +2,7 @@
 #define ENGINEIO_TRANSPORT_H
 
 #include <string>
+
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
 #include <woody/http/http_request.h>
@@ -20,7 +21,7 @@ class BaseTransport {
       : name_(name),
         is_support_binary_(false) {
   }
-  virtual ~BaseTransport() { }
+
   // Get All supported upgrade
   virtual void GetAllUpgrades(std::vector<std::string>& vec) = 0;
   // Handle http request

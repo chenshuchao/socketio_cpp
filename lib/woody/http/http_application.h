@@ -12,7 +12,6 @@ class HTTPResponse;
 // Interface for app which handles the http request.
 class HTTPApplication {
  public:
-  virtual ~HTTPApplication() { }
   virtual void HandleRequest(const HTTPHandlerPtr& handler,
                              const HTTPRequest& req,
                              HTTPResponse& resp) = 0;

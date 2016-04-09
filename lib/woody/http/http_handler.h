@@ -39,9 +39,6 @@ class HTTPHandler : public BaseHandler,
   void SetCloseCallbackWithThis(const CloseCallbackWithThis& cb) {
     close_callback_with_this_ = cb;
   }
-  void UpgradeCallback() {
-    is_dying_ = true;
-  }
 
  private:
   virtual void OnData(const muduo::net::TcpConnectionPtr& conn,
@@ -61,7 +58,6 @@ class HTTPHandler : public BaseHandler,
   RequestCompleteCallback request_complete_callback_;
   CloseCallback close_callback_;
   CloseCallbackWithThis close_callback_with_this_;
-  bool is_dying_; // Whether to be closed;
 };
 typedef boost::shared_ptr<HTTPHandler> HTTPHandlerPtr;
 }

@@ -71,8 +71,8 @@ bool WebsocketHandler::HandleUpgrade(const HTTPHandlerPtr& handler,
       .SetStatus(101, "Switching Protocols");
 
   SetCallback(handler->GetConn());
+  
   resp.End();
-  handler->UpgradeCallback(); 
   return true;
 }
 

@@ -52,16 +52,6 @@ size_t HTTPCodec::OnData(const string& data) {
   return bytes_parsed;
 }
 
-void HTTPCodec::CleanUp() {
-  is_headers_complete_ = false;
-  is_body_complete_ = false;
-  is_upgrade_complete_ = false;
-  cur_header_value_.clear();
-  cur_header_name_.clear();
-  //cur_stream_id_ = 0;
-  request_.CleanUp();
-}
-
 bool HTTPCodec::OnMessageBegin() {
   parseState_ = kParseHeaderBegin;
   //LOG_INFO << "HTTPCodec::OnMessageBegin [].";
@@ -139,6 +129,7 @@ bool HTTPCodec::OnMessageComplete() {
   //LOG_INFO << "HTTPCodec::OnMessageComplete [" << name_ << "].";
   if (message_complete_callback_) {
     message_complete_callback_(cur_stream_id_, request_);
+    request_.CleanUp();
   }
   return true;
 }

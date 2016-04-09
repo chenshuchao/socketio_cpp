@@ -73,7 +73,6 @@ void Socket::OnPacketWhenUpgrading(const Packet& packet) {
     SetTransport(transport_);
   } else {
     upgrading_transport_->ForceClose();
-    upgrading_transport_.reset();
   }
   return;
 }
@@ -81,7 +80,6 @@ void Socket::OnPacketWhenUpgrading(const Packet& packet) {
 bool Socket::MaybeUpgrade(const HTTPHandlerPtr& handler,
                           const HTTPRequest& req,
                           HTTPResponse& resp) {
-  LOG(DEBUG) << "Socket::MaybeUpgrade";
   //if (upgraded_) return false;
   //TODO set upgrade timeout
   string sid, transport;
@@ -118,11 +116,9 @@ void Socket::ForceClose() {
 void Socket::OnClose() {
   LOG(DEBUG) << "Socket::OnClose.";
   if (close_callback_) {
-    LOG(DEBUG) << "Socket::OnClose - without this.";
     close_callback_();
   }
   if (close_callback_with_this_) {
-    LOG(DEBUG) << "Socket::OnClose - with this.";
     close_callback_with_this_(shared_from_this());
   }
 }

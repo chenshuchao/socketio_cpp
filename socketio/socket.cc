@@ -137,11 +137,8 @@ void Socket::Close() {
   if (client) {
     client->Remove(shared_from_this());
   }
-  NamespacePtr nsp = nsp_wptr_.lock();
-  if (nsp) {
-    nsp->RemoveSocket(shared_from_this());
-  }
 }
+
 
 // socket.broadcast
 // nsp.broadcast(emit);
