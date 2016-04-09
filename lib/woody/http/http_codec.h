@@ -37,25 +37,6 @@ class HTTPCodec {
 
   size_t OnData(const std::string& data);
 
-  bool OnMessageBegin();
-
-  bool OnUrl(const char* buf, size_t len);
-
-  bool OnHeaderField(const char* buf, size_t len);
-
-  bool OnHeaderValue(const char* buf, size_t len);
-
-  bool OnHeadersComplete();
-
-  bool OnBody(const char* buf, size_t len);
-
-  bool OnMessageComplete();
-
-  /* TODO delete?
-  std::string GetHeaderName() { return cur_header_name_; }
-  std::string GetHeaderValue() { return cur_header_value_; }
-  */
-
   void SetMessageBeginCallback(const MessageBeginCallback& cb) {
     message_begin_callback_ = cb;
   }
@@ -71,9 +52,26 @@ class HTTPCodec {
   void SetErrorCallback(const ErrorCallback& cb) {
     error_callback_ = cb;
   }
+
+  void CleanUp();
   
  private:
   HeaderParseState parseState_;
+
+  bool OnMessageBegin();
+
+  bool OnUrl(const char* buf, size_t len);
+
+  bool OnHeaderField(const char* buf, size_t len);
+
+  bool OnHeaderValue(const char* buf, size_t len);
+
+  bool OnHeadersComplete();
+
+  bool OnBody(const char* buf, size_t len);
+
+  bool OnMessageComplete();
+
   static int OnMessageBeginCallback(http_parser *parser);
   static int OnUrlCallback(http_parser *parser, const char* buf, size_t len);
   static int OnHeaderFieldCallback(http_parser *parser, const char* buf, size_t len);
